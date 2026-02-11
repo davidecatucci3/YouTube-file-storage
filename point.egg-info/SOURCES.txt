@@ -1,0 +1,11 @@
+pyproject.toml
+src/main/decoder.py
+src/main/download_data.py
+src/main/encoder.py
+src/main/upload_data.py
+src/point.egg-info/PKG-INFO
+src/point.egg-info/SOURCES.txt
+src/point.egg-info/dependency_links.txt
+src/point.egg-info/top_level.txt
+src/readers/img_reader.py
+src/readers/txt_reader.py

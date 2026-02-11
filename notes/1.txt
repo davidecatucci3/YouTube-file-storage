@@ -1,0 +1,23 @@
+if i have a 10GB folder (can be an image, txt, ...) which of these two options is better:
+    EntireData (ED): - 1 video of 10GB -> PRO:
+                            - not limited quotas
+                            - faster to search
+
+                        CONS:
+                            - slower to upload
+                            - slower to download
+
+    ChunkData (CD): - 10 video of 1GB (or 100 video if 100MB) -> PRO:
+                                                    - faster to upload 
+                                                    - faster to download 
+                                              
+                                                CONS:
+                                                    - limited quotas (pay more to have more quotas)
+                                                    - slower to search 
+
+I care about how fast upload or dowload -> - upload: 
+                                        -> - download: depends if i need to retrieve the data frequently
+
+EntireData (ED): if i utlize this program as back up so i access data once every long time
+ChunkData (CD): if i utilize as storage but i access frequently (ONLY PROBLEM THE QUOTA MAY BE EXPENSIVE OR MAY NOT EVEN EASY TO REQUEST MORE)
+
