@@ -3,7 +3,6 @@ The encoder takes as input a folder with filrs of every type inside (.PDF, .txt,
 publish on YouTubr (publish for us means store it)
 '''
 
-import numpy as np
 import magic
 import cv2
 import os
@@ -38,23 +37,26 @@ def get_files(path: str, data_files: list) -> list[str]:
 
     return data_files
 
-def encoder(path_data: str) -> None:
+def encoder(path_data: str) -> list[tuple[int, int]]:
     '''
     Encode all the data and put them in vidoes ready to be loaded
     
     :param path_data: path of the directory where all the data to put in the storage are
+    :return imgs_real_size: contains a list of tuple width real widrth and height of images that have been resized
     '''
 
     data_files = get_files(path_data, [])
 
     # EntireData
-    # create video
-    width, height = 1280, 720   # 1920x1080
-    fps = 24      
-    seconds = 6            
-    frames_per_slide = (fps * seconds) // len(data_files)       
-    output_filename = 'video1.mp4'
-
+    width, height = 1920, 1080
+    fps = 30 # more fps means duration video less and memory video less (slightly), remember MAX 12H and 256GB 
+    output_filename = 'video_encoder.mp4'
+    frames_per_slide = 8 
+    imgs_real_size = []
+  
+    duration = 3 / fps # more fps is high and more the duration is low and memory occupancy low but if fps is too high it's a problem will be ok to create but
+    MAX_DURATION = 12 * 3600 # 12H in sec
+  
     fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
     out = cv2.VideoWriter(output_filename, fourcc, fps, (width, height))  
 
@@ -62,20 +64,25 @@ def encoder(path_data: str) -> None:
         file_type = magic.from_file(file, mime=True)
 
         if file_type.startswith('image/'):
-            frame = img_reader(file, width, height)  
+            real_size, frame = img_reader(file, width, height)  
+
+            rwidth, rheight = real_size
+
+            imgs_real_size.append((rwidth, rheight))
 
             for _ in range(frames_per_slide):
                 out.write(frame)
-        elif file_type == 'text/plain':
+            
+        # elif file_type == 'text/plain':
             #frame = txt_reader(file) 
 
             #out.write(frame)
-            pass
-
-    out.release()
+            #pass
+ 
+    out.release()   
 
     # ChunkData
     # ...
 
-encoder("data")
+    return imgs_real_size
 

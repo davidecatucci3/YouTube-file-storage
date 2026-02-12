@@ -4,10 +4,12 @@ given the url of the video it download it
 
 import yt_dlp
 
-def download_video(url: str) -> None:
+def download_video(url: str) -> str:
+    path_file = "video_decoder.mp4"
+
     ydl_opts = {
         'format': 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best',
-        'outtmpl': '%(title)s.%(ext)s',
+        'outtmpl': path_file
     }
 
     try:
@@ -21,3 +23,4 @@ def download_video(url: str) -> None:
         print(f"An error occurred: {e}")
 
 
+    return path_file

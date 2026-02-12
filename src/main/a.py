@@ -76,8 +76,15 @@ def print_mp4_details(file_path):
         parse_atoms(f, file_size)
 
 # Run it on your file
-print_mp4_details('video1.mp4')
+print_mp4_details('video_encoder.mp4')
 
+print('\n')
+print('\n')
+
+print_mp4_details('video_decoder.mp4')
+
+print('\n')
+print('\n')
 import struct
 import os
 
@@ -131,43 +138,68 @@ def print_hex_dump(data):
         print(f"{i:04x}  {hex_str:<48}  |{ascii_str}|")
 
 # Run it
-get_frame0_bytes('video1.mp4')
+get_frame0_bytes('video_encoder.mp4')
 
-img = Image.open('data/extracted_2.jpg')
+print('\n')
+print('\n')
 
-resized_img = img.resize((1280, 720))
+get_frame0_bytes('video_decoder.mp4')
 
-frame = np.array(resized_img)
+print('\n')
+print('\n')
 
-
+import cv2
 import numpy as np
 
-def inspect_raw_frame():
-    # 1. Create the frame exactly as you do in your code
-    # (Let's recreate your (1,1,1) frame example)
-    width, height = 1280, 720
+def analyze_video(filename, label):
+    print(f"--- Analyzing {label}: {filename} ---")
     
-    # Create a frame where every pixel is (1, 1, 1) - dark gray/black
-    img = Image.open('data/extracted_2.jpg')
+    # 1. Load Video
+    cap = cv2.VideoCapture(filename)
+    if not cap.isOpened():
+        print(f"Error: Could not open {filename}")
+        return
 
-    resized_img = img.resize((1280, 720))
+    # 2. Read Frame 0 (Decodes the compressed math into raw pixels)
+    ret, frame = cap.read()
+    cap.release()
 
-    frame = np.array(resized_img)
+    if not ret:
+        print("Error: Could not read Frame 0")
+        return
 
-    # 2. Convert to raw bytes (flat stream)
-    raw_bytes = frame.tobytes()
+    # 3. Convert from BGR (OpenCV default) to RGB
+    frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+
+    # 4. Flatten the array to a single list of bytes [R, G, B, R, G, B...]
+    # This simulates reading the raw memory line by line
+    raw_bytes = frame_rgb.flatten()
+
+    # 5. Print the first 100 bytes (approx 33 pixels)
+    print(f"First 100 bytes of raw pixel data (Top-Left corner):")
     
-    # 3. Print the first 100 bytes
-    print(f"--- First 100 Raw Bytes of Frame in RAM ---")
-    print(f"Total Frame Size: {len(raw_bytes):,} bytes")
-    print("-" * 50)
-    
-    # Helper to print nicely
-    for i in range(0, 100, 16):
-        chunk = raw_bytes[i:i+16]
-        hex_str = ' '.join(f'{b:02X}' for b in chunk)
-        # ASCII representation (replace non-printable with .)
-        ascii_str = ''.join(chr(b) if 32 <= b < 127 else '.' for b in chunk)
-        print(f"{i:04x}  {hex_str:<48}  |{ascii_str}|")
+    # We iterate 33 times to show 33 full pixels (99 bytes) + 1 partial byte
+    for i in range(0, 100):
+        # Calculate array index positions
+        r_idx = i * 3
+        g_idx = i * 3 + 1
+        b_idx = i * 3 + 2
+        
+        # Get values
+        r = raw_bytes[r_idx]
+        g = raw_bytes[g_idx]
+        b = raw_bytes[b_idx]
+        
+        print(f"Pixel {i}: ({r:3}, {g:3}, {b:3})")
 
-inspect_raw_frame()
+    # The 100th byte is just the Red value of the next pixel
+    print(f"Byte 100 (Pixel 33 Red Only): {raw_bytes[99]}")
+    print("\n")
+
+# REPLACE these filenames with your actual file paths
+analyze_video('video_encoder.mp4', 'Original Video')
+
+print('\n')
+print('\n')
+
+analyze_video('video_decoder.mp4', 'YouTube Video')
