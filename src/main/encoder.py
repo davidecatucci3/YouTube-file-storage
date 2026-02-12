@@ -49,14 +49,11 @@ def encoder(path_data: str) -> None:
 
     # EntireData
     # create video
-    width, height = 1280, 720   
-    fps = 30                    
-    duration = 5 # MAX 12H         
+    width, height = 1280, 720   # 1920x1080
+    fps = 24      
+    seconds = 6            
+    frames_per_slide = (fps * seconds) // len(data_files)       
     output_filename = 'video1.mp4'
-
-    tot_frames = fps * duration
-    bpf = width * height * 3 # bits per frame
-    size_raw_video = bpf * tot_frames # MAX 256GB
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
     out = cv2.VideoWriter(output_filename, fourcc, fps, (width, height))  
@@ -65,13 +62,17 @@ def encoder(path_data: str) -> None:
         file_type = magic.from_file(file, mime=True)
 
         if file_type.startswith('image/'):
-            frame = img_reader(file)  
+            frame = img_reader(file, width, height)  
 
-            out.write(frame)
+            for _ in range(frames_per_slide):
+                out.write(frame)
         elif file_type == 'text/plain':
-            frame = img_reader(file) 
+            #frame = txt_reader(file) 
 
-            out.write(frame)
+            #out.write(frame)
+            pass
+
+    out.release()
 
     # ChunkData
     # ...
