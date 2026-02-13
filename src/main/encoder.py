@@ -54,8 +54,10 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
     frames_per_slide = 8 
     imgs_real_size = []
   
-    duration = 3 / fps # more fps is high and more the duration is low and memory occupancy low but if fps is too high it's a problem will be ok to create but
+    duration = len(data_files) / fps # more fps is high and more the duration is low and memory occupancy low but if fps is too high it's a problem will be ok to create but
     MAX_DURATION = 12 * 3600 # 12H in sec
+
+    print(f'Duration video: {duration}/{MAX_DURATION}')
   
     fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
     out = cv2.VideoWriter(output_filename, fourcc, fps, (width, height))  
@@ -73,11 +75,13 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
             for _ in range(frames_per_slide):
                 out.write(frame)
             
-        # elif file_type == 'text/plain':
-            #frame = txt_reader(file) 
+        elif file_type == 'text/plain':
+            frame = txt_reader(file, width, height) 
 
-            #out.write(frame)
-            #pass
+            imgs_real_size.append((width, height))
+
+            for _ in range(frames_per_slide):
+                out.write(frame)
  
     out.release()   
 

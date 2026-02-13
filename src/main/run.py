@@ -2,12 +2,11 @@
 run.py connect all the main files, the encoder, decoder, ...
 '''
 
-import magic
 import time
 import os
 
 from main.upload_video import initialize_upload, get_authenticated_service
-from decompress.img_decompress import img_adjuster
+from decompress.decompresser import decompresser
 from main.download_video import download_video
 from oauth2client.tools import argparser
 from apiclient.errors import HttpError
@@ -76,15 +75,12 @@ def run(path_data: str) -> None:
 
     decoder(path_video, imgs_real_sizes) # extract files from the video
 
+    '''
     # make the images look like they have been uploaded 
     list_files = os.listdir('out')
 
     for file in list_files:
-        file_type = magic.from_file(file, mime=True)
-
-        if file_type.startswith('image/'):
-            img_adjuster('out')
-        elif file_type == 'text/plain':
-            pass
-
+        decompresser(file)
+    '''
+    
 run('data')
