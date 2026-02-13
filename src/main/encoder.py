@@ -34,7 +34,7 @@ def get_files(path: str, data_files: list) -> list[str]:
 
     for subpath in subpath_onlydir:
         get_files(path + '/' + subpath, data_files)
-
+  
     return data_files
 
 def encoder(path_data: str) -> list[tuple[int, int]]:
@@ -58,7 +58,7 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
     MAX_DURATION = 12 * 3600 # 12H in sec
 
     print(f'Duration video: {duration}/{MAX_DURATION}')
-  
+
     fourcc = cv2.VideoWriter_fourcc(*'mp4v') 
     out = cv2.VideoWriter(output_filename, fourcc, fps, (width, height))  
 
@@ -75,7 +75,7 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
             for _ in range(frames_per_slide):
                 out.write(frame)
         elif file_type == 'text/plain':
-            frame = txt_reader(file, width, height) 
+            frame, block_size = txt_reader(file, width, height) 
 
             imgs_real_size.append((width, height))
 
@@ -87,5 +87,5 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
     # ChunkData
     # ...
 
-    return imgs_real_size, data_files
+    return imgs_real_size, data_files, block_size
 
