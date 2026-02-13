@@ -1,9 +1,4 @@
 pyproject.toml
-point.egg-info/PKG-INFO
-point.egg-info/SOURCES.txt
-point.egg-info/dependency_links.txt
-point.egg-info/requires.txt
-point.egg-info/top_level.txt
 src/decompress/decompresser..py
 src/main/a.py
 src/main/decoder.py
@@ -15,6 +10,7 @@ src/main/upload_video.py
 src/point.egg-info/PKG-INFO
 src/point.egg-info/SOURCES.txt
 src/point.egg-info/dependency_links.txt
+src/point.egg-info/requires.txt
 src/point.egg-info/top_level.txt
 src/readers/img_reader.py
 src/readers/txt_reader.py

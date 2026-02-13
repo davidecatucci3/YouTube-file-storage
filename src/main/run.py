@@ -44,7 +44,7 @@ def run(path_data: str) -> None:
     
     :param path_data: Description
     '''
-    imgs_real_sizes = encoder(path_data) # put data in the video
+    imgs_real_sizes, data_files = encoder(path_data) # put data in the video
 
     VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")  
     argparser.add_argument("--file", default="video_encoder.mp4", help="Video file to upload") #!required=True removed by me
@@ -73,14 +73,12 @@ def run(path_data: str) -> None:
     
     path_video = download_video(url) # download form youtube the video uplaoded
 
-    decoder(path_video, imgs_real_sizes) # extract files from the video
+    decoder(data_files, path_video, imgs_real_sizes) # extract files from the video
 
-    '''
     # make the images look like they have been uploaded 
     list_files = os.listdir('out')
 
     for file in list_files:
         decompresser(file)
-    '''
-    
+
 run('data')

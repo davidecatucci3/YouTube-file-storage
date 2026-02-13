@@ -74,7 +74,6 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
 
             for _ in range(frames_per_slide):
                 out.write(frame)
-            
         elif file_type == 'text/plain':
             frame = txt_reader(file, width, height) 
 
@@ -88,5 +87,5 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
     # ChunkData
     # ...
 
-    return imgs_real_size
+    return imgs_real_size, data_files
 
