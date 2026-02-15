@@ -40,6 +40,3 @@ def txt_reader(file_path: str, width: int, height: int) -> list[list[list[int]]]
     
     return frame_bgr, block_size
 
-
-
-

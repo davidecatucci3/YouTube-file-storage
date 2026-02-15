@@ -1,3 +1,12 @@
-This is a test of inserting text data into a video stream.
-The text is rendered as pixels.
-Even if YouTube transcodes this, the text remains readable.
+Part of a series on
+Artificial intelligence (AI)
+
+Major goals
+Approaches
+Applications
+Philosophy
+History
+Controversies
+Glossary
+
+

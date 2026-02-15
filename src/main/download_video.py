@@ -1,5 +1,5 @@
 '''
-given the url of the video it download it
+given the url of the youtube video it download it
 '''
 
 import yt_dlp
@@ -21,6 +21,5 @@ def download_video(url: str) -> str:
             print("\nDownload complete!")
     except Exception as e:
         print(f"An error occurred: {e}")
-
 
     return path_file
