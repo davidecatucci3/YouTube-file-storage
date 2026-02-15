@@ -23,3 +23,4 @@ def download_video(url: str) -> str:
         print(f"An error occurred: {e}")
 
     return path_file
+

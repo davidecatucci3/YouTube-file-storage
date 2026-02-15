@@ -52,7 +52,7 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
     width, height = config.width, config.height # video frame dimension
     fps = 30 
     output_filename = 'video_encoder.mp4'
-    frames_per_slide = 8 #! better to remove but how 
+    frames_per_slide = 8
 
     imgs_size = []
     all_frame_needed = [] # number if frames neeed to store the ith data file (if 1 needs just 1 frame)
@@ -84,16 +84,17 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
                     for _ in range(frames_per_slide):
                         out.write(frame[r])
         elif file_type.startswith('text/'):
-            frame = txt_reader(file_path) 
+            frame, frame_needed = txt_reader(file_path) 
 
             imgs_size.append((width, height))
-            all_frame_needed.append(1)
+            all_frame_needed.append(frame_needed)
 
-            curr_duration += (1 * frames_per_slide) / fps
+            curr_duration += (frame_needed * frames_per_slide) / fps
 
-            for _ in range(frames_per_slide):
-                out.write(frame)
-
+            for r in range(frame_needed):
+                for _ in range(frames_per_slide):
+                    out.write(frame[r])
+        
         print(f'Current video duration (in seconds): {curr_duration:.3f}/{MAX_DURATION}')
  
     out.release()   
@@ -103,3 +104,5 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
 
     return imgs_size, data_files, all_frame_needed, frames_per_slide
 
+# TODO:
+# frames_per_slice should be 1 or less as possible

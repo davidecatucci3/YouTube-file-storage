@@ -2,7 +2,7 @@
 Some variables that every file share
 '''
 
-# Video frame
+# Video
 width = 1920
 height = 1080
 

@@ -6,8 +6,6 @@ import time
 import os
 
 from main.upload_video import initialize_upload, get_authenticated_service
-from decompress.img_decompresser import img_decompresser
-from decompress.txt_decompresser import txt_decompresser
 from main.download_video import download_video
 from oauth2client.tools import argparser
 from apiclient.errors import HttpError
@@ -16,7 +14,7 @@ from main.decoder import decoder
 
 def wait_for_processing(youtube, video_id):
     print(f"Waiting for video {video_id} to finish processing...")
-
+    
     while True:
         request = youtube.videos().list(
             part="processingDetails,status",
@@ -28,6 +26,7 @@ def wait_for_processing(youtube, video_id):
             print("Video not found yet...")
         else:
             status = response['items'][0]['status']['uploadStatus']
+
             if status == "processed":
                 print("Video is ready!")
 
