@@ -2,7 +2,7 @@
 The encoder takes as input a folder with data of every type inside (.PDF, .txt, .JPG, .py, ...) and put them in a video of 256GB to 
 publish on YouTube (pusblished so it can be stored)
 '''
-
+import config
 import magic
 import cv2
 import os
@@ -49,7 +49,7 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
     data_files = get_files(path_data, [])
 
     # EntireData (store everything in less video possible)
-    width, height = 1920, 1080 # video frame dimension
+    width, height = config.width, config.height # video frame dimension
     fps = 30 
     output_filename = 'video_encoder.mp4'
     frames_per_slide = 8 #! better to remove but how 
@@ -67,7 +67,7 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
         file_type = magic.from_file(file_path, mime=True)
 
         if file_type.startswith('image/'):
-            size, frame, frame_needed = img_reader(file_path, width, height)  
+            size, frame, frame_needed = img_reader(file_path)  
             
             img_width, img_height = size
 
@@ -84,7 +84,7 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
                     for _ in range(frames_per_slide):
                         out.write(frame[r])
         elif file_type.startswith('text/'):
-            frame, block_size = txt_reader(file_path, width, height) 
+            frame = txt_reader(file_path) 
 
             imgs_size.append((width, height))
             all_frame_needed.append(1)
@@ -101,5 +101,5 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
     # ChunkData (store everything in more video possible)
     # ...
 
-    return imgs_size, data_files, block_size, all_frame_needed, frames_per_slide, width, height
+    return imgs_size, data_files, all_frame_needed, frames_per_slide
 

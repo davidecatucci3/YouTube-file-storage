@@ -2,7 +2,6 @@
 run.py connect all the main files, the encoder, decoder, ... is the file that needs to be used to run everything
 '''
 
-import magic
 import time
 import os
 
@@ -47,11 +46,11 @@ def run(path_data: str) -> None:
     :param path_data: path of the folder where all the data are
     '''
     
-    imgs_size, data_files, block_size, all_frame_needed, frames_per_slide, video_width, video_height = encoder(path_data) # put data in the video
+    imgs_size, data_files, all_frame_needed, frames_per_slide = encoder(path_data) # put data in the video
 
     # upload video on youtube
     VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")  
-    argparser.add_argument("--file", default="video_encoder.mp4", help="Video file to upload") #!required=True removed by me
+    argparser.add_argument("--file", default="video_encoder.mp4", help="Video file to upload")
     argparser.add_argument("--title", help="Video title", default="Test Title")
     argparser.add_argument("--description", help="Video description",
         default="Test Description")
@@ -77,18 +76,6 @@ def run(path_data: str) -> None:
     
     path_video = download_video(url) # download from youtube the video uplaoded before
 
-    decoder(data_files, path_video, imgs_size, block_size, all_frame_needed, frames_per_slide, video_width, video_height) # extract data from the video
-    """
-    # decompress data that youtube compresser has modified
-    list_path_files = os.listdir('out')
-
-    for file_path in list_path_files:
-        file_type = magic.from_file(file_path, mime=True)
-
-        if file_type.startswith('image/'):
-            img_decompresser(file_path)
-        elif file_type.startswith('text/'):
-            txt_decompresser(file_path)
-    """
+    decoder(data_files, path_video, imgs_size, all_frame_needed, frames_per_slide) # extract data from the video and decompress it
 
 run('data')
