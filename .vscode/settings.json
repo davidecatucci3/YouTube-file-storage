@@ -1,6 +1,0 @@
-{
-    "files.exclude": {
-        "**/*.egg-info": true,
-        "**/__pycache__": true
-    }
-}
