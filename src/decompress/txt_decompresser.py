@@ -36,5 +36,4 @@ def txt_decompresser(frame: list, output_folder: str, frame_count: int,  frame_n
         f.write(txt)
 
 # TODO:
-# IF ONLY 10% OR LESS LETTERS OF A WORDS ARE WRONG I CAN USE AI OR WORD RECONSTRUCTION SO IT DOEDS NOT NEED TO BE PERFECT THE DECOMPRESSION JUST LESS LETTERS PER WORDS SO I CAN RECONSTRUCIT IN FEW TIME (or ...)
 # speedup
