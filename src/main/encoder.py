@@ -120,3 +120,4 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
 
 # TODO:
 # frames_per_slice should be 1 or less as possible
+# how many API call can i do per day, how many video i can upload per day?

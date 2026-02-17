@@ -73,10 +73,10 @@ def run(path_data: str) -> None:
     for file in data_files:
         db.update({'url': url}, User.path_file == file)
 
-    #wait_for_processing(youtube, video_id) # waits until the youtube video is uploaded so it can download it
+    wait_for_processing(youtube, video_id) # waits until the youtube video is uploaded so it can download it
     
-    #path_video = download_video(url) # download from youtube the video uplaoded before
+    path_video = download_video(url) # download from youtube the video uplaoded before
 
-    #decoder(data_files, path_video, imgs_size, all_frame_needed) # extract data from the video and decompress it
+    decoder(data_files, path_video, imgs_size, all_frame_needed) # extract data from the video and decompress it
 
 run('data')

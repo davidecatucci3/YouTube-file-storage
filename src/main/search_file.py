@@ -7,7 +7,6 @@ import yt_dlp
 import config
 import cv2
 
-
 from decompress.img_decompresser import img_decompresser
 from decompress.txt_decompresser import txt_decompresser
 from tinydb import TinyDB, Query
@@ -74,5 +73,3 @@ def search_file(path_file: str) -> str:
         img_decompresser(inp_img, 'sea', 0, w, h) 
     elif file_type.startswith('text/'):
         txt_decompresser(inp_img, 'sea', 0, frame_needed)
-
-search_file('data/Beta/Epsilon/Zeta/document_2.txt')
