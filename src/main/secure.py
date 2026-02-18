@@ -1,34 +1,36 @@
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import os
 
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+# 1. Your 8-element input
+input_arr = [10, 20, 30, 40, 50, 60, 70, 80]
+data_bytes = bytes(input_arr)
 
-def fast_256_transform(input_32_bytes, key_32_bytes):
-    if len(input_32_bytes) != 32 or len(key_32_bytes) != 32:
-        raise ValueError("Input and Key must be exactly 32 bytes.")
+# 2. Setup (Key must be 32 bytes, Nonce/IV must be 16 bytes for AES)
+key = os.urandom(32) 
+nonce = os.urandom(16)
+base_nonce_int = int.from_bytes(nonce, 'big')
+current_nonce_int = (base_nonce_int + 2) % (2**128)
+current_nonce_bytes = current_nonce_int.to_bytes(16, 'big')
 
-    cipher = Cipher(algorithms.AES(key_32_bytes), modes.ECB())
-    encryptor = cipher.encryptor()
-    
-    return encryptor.update(input_32_bytes) + encryptor.finalize()
+# 3. Initialize AES in CTR mode (Stream cipher mode)
+cipher = Cipher(algorithms.AES(key), modes.CTR(current_nonce_bytes))
+encryptor = cipher.encryptor()
 
-def fast_256_revert(output_32_bytes, key_32_bytes):
-    cipher = Cipher(algorithms.AES(key_32_bytes), modes.ECB())
-    decryptor = cipher.decryptor()
+# 4. Encrypt
+encrypted_bytes = encryptor.update(data_bytes) + encryptor.finalize()
 
-    return decryptor.update(output_32_bytes) + decryptor.finalize()
+# 5. Convert back to a list of 8 elements
+encrypted_arr = list(encrypted_bytes)
 
-# --- Execution ---
-secret_key = os.urandom(32)  # Your 256-bit Key
-raw_input = os.urandom(32)   # Your 256-bit Input Data
+decryptor = cipher.decryptor()
 
-# Transform
-encoded = fast_256_transform(raw_input, secret_key)
-# Revert
-original = fast_256_revert(encoded, secret_key)
+# 3. Decrypt
+decrypted_bytes = decryptor.update(encrypted_bytes) + decryptor.finalize()
 
-print(f"Input (Hex):  {raw_input.hex()}")
-print(f"Output (Hex): {encoded.hex()}")
-print(f"Match:        {raw_input == original}")
+# 4. Convert back to a list of integers
+original_arr = list(decrypted_bytes)
 
-bits = ''.join(format(byte, '08b') for byte in encoded)
-bits_hex = bytes(int(bits[i:i+8], 2) for i in range(0, len(bits), 8))
+print(input_arr)
+print(f"Encrypted Input: {encrypted_arr}")
+print(f"Decrypted Output: {original_arr}")
+

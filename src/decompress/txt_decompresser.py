@@ -1,6 +1,9 @@
 import config
 import os
 
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from tinydb import TinyDB, Query
+
 def txt_decompresser(frame: list, output_folder: str, frame_count: int,  frame_needed: int, data_files=None) -> list:
     if data_files != None:
         name = data_files[frame_count].split('/')[-1]
@@ -9,28 +12,54 @@ def txt_decompresser(frame: list, output_folder: str, frame_count: int,  frame_n
         filename = os.path.join(output_folder, 'file.txt')
     
     txt = ''
+
+    db = TinyDB('my_data.json')
+    User = Query()
+
+    res = db.get(User.path_file == data_files[frame_count])
+
+    key = bytes.fromhex(res['key'])
+    nonce = bytes.fromhex(res['nonce'])
+    start_nonce_count = res['start nonce count']
+    num_pix_char = res['num pix char']
+
+    chars_read = 0
+    base_nonce_int = int.from_bytes(nonce, 'big')
  
     for z in range(frame_needed):
         for i in range(1, len(frame[z]), config.block_size):
             frame_i = [frame[z][i][j][0] for j in range(1, len(frame[z][i]), config.block_size)] 
         
             for j in range(0, len(frame_i), 8):
+                if chars_read >= num_pix_char:
+                    break
+        
                 pixels = frame_i[j:j + 8]
+
+                current_nonce_int = (base_nonce_int + start_nonce_count) % (2**128)
+                current_nonce_bytes = current_nonce_int.to_bytes(16, 'big')
+
+                cipher = Cipher(algorithms.AES(key), modes.CTR(current_nonce_bytes))
+                decryptor = cipher.decryptor()
+                
+                decrypted_bytes = decryptor.update(bytes(pixels)) + decryptor.finalize()
+
+                pixels_dec = list(decrypted_bytes)
+
                 bits = ''
             
-                for p in pixels:
+                for p in pixels_dec:
                     if p > 127:
                         bits += '1'
                     else:
                         bits += '0'
 
                 char_code = int(bits, 2)
-                
-                # stop if we hit NULL (End of data)
-                if char_code == 0: # 0 in ascii UNICODE correspond to Null (invisible)
-                    continue
             
                 txt += chr(char_code)
+
+                start_nonce_count += 1
+                chars_read += 1
               
     with open(filename, 'w') as f:
         f.write(txt)
