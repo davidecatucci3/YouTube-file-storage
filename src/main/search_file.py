@@ -73,3 +73,4 @@ def search_file(path_file: str) -> str:
         img_decompresser(frames, 'sea', frame_needed, 0, img_width, img_height) 
     elif file_type.startswith('text/'):
         txt_decompresser(frames, 'sea', 0, frame_needed)
+    

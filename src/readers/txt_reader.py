@@ -46,7 +46,6 @@ def txt_reader(path_file: str) -> np.ndarray:
 
     char_stream = get_character_generator(path_file)
 
-    # START
     for f in range(frame_needed):
         k = 0
         i, j = 0, 0

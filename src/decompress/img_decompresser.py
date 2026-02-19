@@ -45,6 +45,8 @@ def img_decompresser(frames: list, output_folder: str, frame_needed: int, frame_
                     
                     img_arr[count_h, count_w, c] = pixel
 
+                    # there is not if pixel == 0 :continue because can be exchanged with the color black and jump important data
+
                     count_w += 1
 
                     if count_w >= img_width:
