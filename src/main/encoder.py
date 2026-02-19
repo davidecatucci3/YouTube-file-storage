@@ -1,7 +1,8 @@
 '''
-The encoder takes as input a folder with data of every type inside (.PDF, .txt, .JPG, .py, ...) and put them in a video of 256GB to 
+The encoder takes as input a folder with data of every type inside (.PDF, .txt, .JPG, .py, ...) and put them in a video of 256GB to be
 publish on YouTube (pusblished so it can be stored)
 '''
+
 import config
 import magic
 import cv2
@@ -52,72 +53,62 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
     db = TinyDB('my_data.json')
 
     # EntireData (store everything in less video possible)
-    width, height = config.width, config.height # video frame dimension
+    video_width, video_height = config.video_width, config.video_height # video frame dimension
     fps = 30
-    output_filename = 'video_encoder.mp4'
+    filename = 'video_encoder.mp4'
     frames_per_slide = config.frames_per_slide
+    fourcc = cv2.VideoWriter_fourcc(*'avc1')  
+    out = cv2.VideoWriter(filename, fourcc, fps, (video_width, video_height))  
     
-    imgs_size = []
     all_frame_needed = [] # number if frames neeed to store the ith data file (if 1 needs just 1 frame)
     curr_frame = 0
-
     curr_duration = 0.0
     MAX_DURATION = 12 * 3600 # 12H in sec
 
-    fourcc = cv2.VideoWriter_fourcc(*'avc1') 
-    out = cv2.VideoWriter(output_filename, fourcc, fps, (width, height))  
-
-    for file_path in data_files:
-        file_type = magic.from_file(file_path, mime=True)
+    for path_file in data_files:
+        file_type = magic.from_file(path_file, mime=True)
 
         if file_type.startswith('image/'):
-            size, frame, frame_needed = img_reader(file_path)  
+            size, frames, frame_needed = img_reader(path_file)  
             
             img_width, img_height = size
 
-            all_frame_needed.append(frame_needed)
-            imgs_size.append((img_width, img_height))
-
-            curr_duration += (frame_needed * frames_per_slide) / fps
-
             frame_start = curr_frame
             frame_end = frame_start + (frame_needed * frames_per_slide)
 
-            db.insert({'path_file': file_path, 'url': '', 'file type': file_type, 'frame dim': (img_width, img_height), 'frame needed': frame_needed, 'frame start': frame_start, 'frame end': frame_end})
+            db.insert({'path_file': path_file, 'url': '', 'file type': file_type, 'frame dim': (img_width, img_height), 'frame needed': frame_needed, 'frame start': frame_start, 'frame end': frame_end})
 
             for r in range(frame_needed):
                 for _ in range(frames_per_slide):
-                    out.write(frame[r])
+                    out.write(frames[r])
 
                     curr_frame += 1
         elif file_type.startswith('text/'):
-            frame, frame_needed = txt_reader(file_path) 
-
-            imgs_size.append((width, height))
-            all_frame_needed.append(frame_needed)
-
-            curr_duration += (frame_needed * frames_per_slide) / fps
+            frames, frame_needed = txt_reader(path_file) 
 
             frame_start = curr_frame
             frame_end = frame_start + (frame_needed * frames_per_slide)
             
-            db.insert({'path_file': file_path, 'url': '', 'file type': file_type, 'frame dim': (0, 0), 'frame needed': frame_needed, 'frame start': frame_start, 'frame end': frame_end})
+            db.insert({'path_file': path_file, 'url': '', 'file type': file_type, 'frame dim': (0, 0), 'frame needed': frame_needed, 'frame start': frame_start, 'frame end': frame_end})
             
             for r in range(frame_needed):
                 for _ in range(frames_per_slide):
-                    out.write(frame[r])
+                    out.write(frames[r])
 
                     curr_frame += 1
+    
+        all_frame_needed.append(frame_needed)
+
+        curr_duration += (frame_needed * frames_per_slide) / fps
         
         print(f'Current video duration (in seconds): {curr_duration:.3f}/{MAX_DURATION}')
  
     out.release()   
-    
-    # ChunkData (store everything in more video possible)
-    # ...
 
-    return imgs_size, data_files, all_frame_needed
+    return data_files, all_frame_needed
 
 # TODO:
+# get curr size not curr duration only 
+# in fourcc which choose?
 # frames_per_slice should be 1 or less as possible
 # how many API call can i do per day, how many video i can upload per day?
