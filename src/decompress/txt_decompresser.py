@@ -45,7 +45,7 @@ def txt_decompresser(frame: list, output_folder: str, frame_count: int,  frame_n
                 decrypted_bytes = decryptor.update(bytes(pixels)) + decryptor.finalize()
 
                 pixels_dec = list(decrypted_bytes)
-
+                
                 bits = ''
             
                 for p in pixels_dec:

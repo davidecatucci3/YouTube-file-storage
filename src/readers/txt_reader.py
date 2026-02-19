@@ -56,9 +56,9 @@ def txt_reader(file_path: str, curr_frame: int) -> np.ndarray:
 
     frame_start = curr_frame
     frame_end = frame_start + (frame_needed * config.frames_per_slide)
+    
     db.insert({'path_file': file_path, 'url': '', 'file type': 'text/', 'frame dim': (0, 0), 'frame needed': frame_needed, 'frame start': frame_start, 'frame end': frame_end, 'key': '', 'nonce': '', 'start nonce count': 0, 'end nonce count': 0, 'num pix char': 0})
             
-    
     # START
     key = os.urandom(32) 
     nonce = os.urandom(16)
@@ -142,46 +142,3 @@ def txt_reader(file_path: str, curr_frame: int) -> np.ndarray:
 # - extremely slow if large large text like 1000+ pages of books needs to be speed up using numpy 
 # - encoding (for all language and chars 8 bits is not sufficent)
 
-
-'''x, _ = txt_reader('a.txt')
-txt = ''
-nonce_count = 0
-chars_read = 0
-total_chars_to_read = 117
-base_nonce_int = int.from_bytes(nonce, 'big')
-
-for i in range(1, len(x[0]), config.block_size):
-            frame_i = [x[0][i][j][0] for j in range(1, len(x[0][i]), config.block_size)] 
-
-            for j in range(0, len(frame_i), 8):
-                if chars_read >= total_chars_to_read:
-                    break
-
-                pixels = frame_i[j:j + 8]
-
-                current_nonce_int = (base_nonce_int + nonce_count) % (2**128)
-                current_nonce_bytes = current_nonce_int.to_bytes(16, 'big')
-
-                cipher = Cipher(algorithms.AES(key), modes.CTR(current_nonce_bytes))
-                decryptor = cipher.decryptor()
-                
-                decrypted_bytes = decryptor.update(bytes(pixels)) + decryptor.finalize()
-
-                pixels_dec = list(decrypted_bytes)
-
-                bits = ''
-                
-                for p in pixels_dec:
-                    if p > 127:
-                        bits += '1'
-                    else:
-                        bits += '0'
-
-                char_code = int(bits, 2)
-            
-                txt += chr(char_code)
-
-                nonce_count += 1
-                chars_read += 1
-        
-print(txt)'''

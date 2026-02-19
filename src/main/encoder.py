@@ -9,7 +9,6 @@ import os
 
 from readers.img_reader import img_reader
 from readers.txt_reader import txt_reader
-from tinydb import TinyDB
 
 def get_files(path: str, data_files: list) -> list[str]:
     '''
@@ -49,8 +48,6 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
 
     data_files = get_files(path_data, [])
 
-    db = TinyDB('my_data.json')
-
     # EntireData (store everything in less video possible)
     width, height = config.width, config.height # video frame dimension
     fps = 30
@@ -71,20 +68,15 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
         file_type = magic.from_file(file_path, mime=True)
 
         if file_type.startswith('image/'):
-            size, frame, frame_needed = img_reader(file_path)  
+            size, frame, frame_needed = img_reader(file_path, curr_frame)  
             
             img_width, img_height = size
 
             all_frame_needed.append(frame_needed)
             imgs_size.append((img_width, img_height))
 
-            curr_duration += (frame_needed * frames_per_slide) / fps
-
-            frame_start = curr_frame
-            frame_end = frame_start + (frame_needed * frames_per_slide)
-
-            db.insert({'path_file': file_path, 'url': '', 'file type': file_type, 'frame dim': (img_width, img_height), 'frame needed': frame_needed, 'frame start': frame_start, 'frame end': frame_end, 'key': '', 'nonce': '', 'nonce count': 0, 'num pix char': 0})
-
+            curr_duration += (frame_needed * config.frames_per_slide) / fps
+            
             for r in range(frame_needed):
                 for _ in range(frames_per_slide):
                     out.write(frame[r])
@@ -98,11 +90,6 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
 
             curr_duration += (frame_needed * frames_per_slide) / fps
 
-            frame_start = curr_frame
-            frame_end = frame_start + (frame_needed * frames_per_slide)
-            
-            #db.insert({'path_file': file_path, 'url': '', 'file type': file_type, 'frame dim': (0, 0), 'frame needed': frame_needed, 'frame start': frame_start, 'frame end': frame_end, 'key': '', 'nonce': '', 'nonce count': 0, 'num pix char': 0})
-            
             for r in range(frame_needed):
                 for _ in range(frames_per_slide):
                     out.write(frame[r])

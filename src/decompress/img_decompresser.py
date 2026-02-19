@@ -3,7 +3,10 @@ import config
 import cv2
 import os
 
-def img_decompresser(frame: list, output_folder: str, frame_count: int, data_files=None, imgs_size=None, w=None, h=None) -> list:
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from tinydb import TinyDB, Query
+
+def img_decompresser(frame: list, output_folder: str, frame_count: int, frame_needed: int, data_files=None, imgs_size=None, w=None, h=None) -> list:
     if data_files != None:
         name = data_files[frame_count].split('/')[-1]
         filename = os.path.join(output_folder, name)
@@ -20,36 +23,51 @@ def img_decompresser(frame: list, output_folder: str, frame_count: int, data_fil
     else:
         target_w, target_h = w, h
 
-    # A. Sampling (Center of blocks)
-    offset = block_size // 2
-    sampled_grid = frame[:, offset:input_h:block_size, offset:input_w:block_size, :]
+    db = TinyDB('my_data.json')
+    User = Query()
 
-    # B. Thresholding
-    bits_recovered = (sampled_grid > 127).astype(np.uint8)
+    res = db.get(User.path_file == data_files[frame_count])
 
-    # C. Flatten to bit stream
-    # Shape: (Total_Bits_Vertical, 3)
-    # Because of our encoder Transpose, this is now correctly ordered:
-    # Row 0: [Pixel0_Bit0_B, Pixel0_Bit0_G, Pixel0_Bit0_R]
-    flat_bits = bits_recovered.reshape(-1, 3)
+    key = bytes.fromhex(res['key'])
+    nonce = bytes.fromhex(res['nonce'])
+    start_nonce_count = res['start nonce count']
+    num_pix_char = res['num pix char']
 
-    # D. Truncate Padding
-    total_pixels = target_w * target_h
-    # We need exactly 8 rows per pixel (8 bits)
-    required_rows = total_pixels * 8
-    flat_bits = flat_bits[:required_rows]
+    pix_read = 0
+    base_nonce_int = int.from_bytes(nonce, 'big')
 
-    # E. Reshape for Packing
-    # We group every 8 rows together. 
-    # Shape becomes: (Pixels, 8_Bits, 3_Channels)
-    flat_bits_grouped = flat_bits.reshape(total_pixels, 8, 3)
+    for z in range(frame_needed):
+        for c in range(3):
+            for i in range(1, len(frame[z]), config.block_size):
+                frame_i = [frame[z][i][j][c] for j in range(1, len(frame[z][i]), config.block_size)] 
+            
+                for j in range(0, len(frame_i), 8):
+                    if chars_read >= num_pix_char:
+                        break
+            
+                    pixels = frame_i[j:j + 8]
 
-    # F. Pack Bits
-    # We pack along axis 1 (the 8 bits).
-    # Result: (Pixels, 1, 3)
-    img_packed = np.packbits(flat_bits_grouped, axis=1)
+                    current_nonce_int = (base_nonce_int + start_nonce_count) % (2**128)
+                    current_nonce_bytes = current_nonce_int.to_bytes(16, 'big')
 
-    # G. Final Reshape
-    img_final = img_packed.reshape(target_h, target_w, 3)
+                    cipher = Cipher(algorithms.AES(key), modes.CTR(current_nonce_bytes))
+                    decryptor = cipher.decryptor()
+                    
+                    decrypted_bytes = decryptor.update(bytes(pixels)) + decryptor.finalize()
+
+                    pixels_dec = list(decrypted_bytes)
+                    
+                    bits = ''
+                
+                    for p in pixels_dec:
+                        if p > 127:
+                            bits += '1'
+                        else:
+                            bits += '0'
+
+                    char_code = int(bits, 2)
+
+                    start_nonce_count += 1
+                    chars_read += 1
 
     cv2.imwrite(filename, img_final)
