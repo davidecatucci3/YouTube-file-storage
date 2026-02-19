@@ -22,7 +22,7 @@ def wait_for_processing(youtube, video_id):
             id=video_id
         )
         response = request.execute()
-
+        
         if not response['items']:
             print("Video not found yet...")
         else:

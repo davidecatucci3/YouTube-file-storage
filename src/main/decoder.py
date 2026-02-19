@@ -93,10 +93,10 @@ def decoder(data_files: str, path_video: str, all_frame_needed: list[int]) -> No
             # i dont't want to check the frames_per_slice frames that are just the copy of the one i want to see so i skip them
             frame_count_local2 = 0
 
-            while i < frame_count_local2 - 1:
+            while frame_count_local2 < frames_per_slide - 1:
                 ret, frame = cap.read()
 
-                i += 1
+                frame_count_local2 += 1
    
         print(f"Saved {data_files[count_files - 1]}")
     

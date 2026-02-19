@@ -6,7 +6,7 @@ import string
 
 # --- Configuration ---
 ROOT_DIR = "data"
-TOTAL_FILES = 8
+TOTAL_FILES = 20
 MAX_DEPTH = 3         # How deep the folder structure can go
 MAX_SUBDIRS = 2       # Max number of subfolders per folder folder
 

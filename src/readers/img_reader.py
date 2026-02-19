@@ -54,10 +54,10 @@ def img_reader(path_file: str) -> np.ndarray:
                         j = 0
                         i += block_size
 
+                k += 1
+                        
                 if i >= video_height: # no space in this frame anymore                     
                     break
-                
-                k += 1
             
             k_final = k
 
