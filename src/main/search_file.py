@@ -53,9 +53,9 @@ def search_file(path_file: str) -> str:
     frame_needed = res['frame needed']
     frame_start = res['frame start']
     frame_end = res['frame end']
-    w, h = res['frame dim']
+    img_width, img_height = res['frame dim'] # only if data is an image
 
-    inp_img = np.zeros((frame_needed, config.height, config.width, 3))
+    frames = np.zeros((frame_needed, config.video_height, config.video_width, 3))
 
     j = 0
     frame_count_local = 0
@@ -63,13 +63,14 @@ def search_file(path_file: str) -> str:
     for _, frame_i in get_frame(url, frame_start, frame_end):
         while frame_count_local < frame_needed * config.frames_per_slide - 1:
             if frame_count_local % config.frames_per_slide == 0:
-                inp_img[j] = frame_i
+                frames[j] = frame_i
 
                 j += 1
                         
             frame_count_local += 1
     
     if file_type.startswith('image/'):
-        img_decompresser(inp_img, 'sea', 0, w, h) 
+        img_decompresser(frames, 'sea', frame_needed, 0, img_width, img_height) 
     elif file_type.startswith('text/'):
-        txt_decompresser(inp_img, 'sea', 0, frame_needed)
+        txt_decompresser(frames, 'sea', 0, frame_needed)
+    

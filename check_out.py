@@ -118,6 +118,9 @@ def get_files(path, extensions, recursive=False):
             pass
     return found_files
 
+import os
+import difflib
+
 # --- MAIN LOGIC ---
 print("Scanning and aligning files...")
 x_txts = get_files('data', ('.txt', '.py'), recursive=True)
@@ -138,57 +141,54 @@ for i, (path_x, path_y) in enumerate(zip(x_txts, y_txts)):
             
             words1 = f1.read().split()
             words2 = f2.read().split()
-            
-            # Calculate overall stats
-            word_edits = levenshtein_distance(words1, words2)
             max_len = max(len(words1), len(words2))
             
             if max_len > 0:
+                # Initialize SequenceMatcher ONCE
+                matcher   = difflib.SequenceMatcher(None, words1, words2, autojunk=False)
+                opcodes = matcher.get_opcodes()
+                
+                # 1. Calculate word edits directly from the opcodes
+                word_edits = 0
+                for tag, i1, i2, j1, j2 in opcodes:
+                    if tag == 'replace':
+                        word_edits += max((i2 - i1), (j2 - j1))
+                    elif tag == 'delete':
+                        word_edits += (i2 - i1)
+                    elif tag == 'insert':
+                        word_edits += (j2 - j1)
+                
                 error_rate_percent = (word_edits / max_len) * 100
                 print(f"[{i}] {match_tag} names ({name_x}) | Word Edits: {word_edits} | Error Rate: {error_rate_percent:.2f}%")
                 
-                # --- PRINT FIRST 15 WORD MISMATCHES ---
+                # 2. Print first 15 Word Mismatches
                 if word_edits > 0:
-                    matcher = difflib.SequenceMatcher(None, words1, words2)
                     count_words_printed = 0
                     limit = 15
-                    
                     print(f"    First 15 Word Mismatches:")
                     
-                    for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+                    for tag, i1, i2, j1, j2 in opcodes:
                         if tag == 'equal':
                             continue
                         
-                        # Get the mismatched chunk
-                        chunk1 = words1[i1:i2] # Expected
-                        chunk2 = words2[j1:j2] # Actual
+                        chunk1 = words1[i1:i2]
+                        chunk2 = words2[j1:j2]
                         
-                        # If the chunk is larger than our remaining limit, slice it!
                         remaining = limit - count_words_printed
-                        
-                        # Prepare display strings (truncated if necessary)
                         c1_disp = chunk1[:remaining]
                         c2_disp = chunk2[:remaining]
                         
-                        # Construct the string to print
                         str1_text = " ".join(c1_disp)
                         str2_text = " ".join(c2_disp)
                         
-                        # Add ellipsis if we are truncating a long block
-                        if len(chunk1) > remaining or len(chunk2) > remaining:
-                            suffix = "..."
-                        else:
-                            suffix = ""
+                        suffix = "..." if (len(chunk1) > remaining or len(chunk2) > remaining) else ""
 
                         if tag == 'replace':
                             print(f"      * '{str1_text}{suffix}' -> '{str2_text}{suffix}'")
-                            # Count how many words we just showed (max of expected vs actual)
                             count_words_printed += max(len(c1_disp), len(c2_disp))
-                            
                         elif tag == 'delete':
                             print(f"      * '{str1_text}{suffix}' -> (MISSING)")
                             count_words_printed += len(c1_disp)
-                            
                         elif tag == 'insert':
                             print(f"      * (MISSING) -> '{str2_text}{suffix}'")
                             count_words_printed += len(c2_disp)

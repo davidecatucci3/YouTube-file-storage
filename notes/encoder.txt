@@ -1,7 +1,0 @@
-EFFICENCY ENCODER:
-- when searching for files in data path: hwo to efficiently traverse the tree path
-- efficeney memory data structure to store all files string name 
-
-how to store the files in data files (in which order):
-    if EntyreData: no matter 
-    if ChunkDatta: the biggest one (in size) maybe?

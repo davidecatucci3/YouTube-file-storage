@@ -1,5 +1,5 @@
 '''
-run.py connect all the main files, the encoder, decoder, ... is the file that needs to be used to run everything
+run.py connect all the main files, the encoder, decoder, ...; is the file that needs to be used to run everything
 '''
 
 import time
@@ -22,7 +22,7 @@ def wait_for_processing(youtube, video_id):
             id=video_id
         )
         response = request.execute()
-
+        
         if not response['items']:
             print("Video not found yet...")
         else:
@@ -46,8 +46,8 @@ def run(path_data: str) -> None:
     :param path_data: path of the folder where all the data are
     '''
     
-    imgs_size, data_files, all_frame_needed = encoder(path_data) # put data in the video
-    print(imgs_size, data_files, all_frame_needed)
+    data_files, all_frame_needed = encoder(path_data) # put data in the video
+    print(data_files, all_frame_needed)
     # upload video on youtube
     VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")  
     argparser.add_argument("--file", default="video_encoder.mp4", help="Video file to upload")
@@ -70,13 +70,13 @@ def run(path_data: str) -> None:
     db = TinyDB('my_data.json')
     User = Query()
 
-    for file in data_files:
-        db.update({'url': url}, User.path_file == file)
+    for path_file in data_files:
+        db.update({'url': url}, User.path_file == path_file)
 
     wait_for_processing(youtube, video_id) # waits until the youtube video is uploaded so it can download it
     
     path_video = download_video(url) # download from youtube the video uplaoded before
 
-    decoder(data_files, path_video, imgs_size, all_frame_needed) # extract data from the video and decompress it
+    decoder(data_files, path_video, all_frame_needed) # extract data from the video and decompress it
 
 run('data')

@@ -3,53 +3,69 @@ import config
 import cv2
 import os
 
-def img_decompresser(frame: list, output_folder: str, frame_count: int, data_files=None, imgs_size=None, w=None, h=None) -> list:
+import numpy as np
+import config
+import cv2
+import os
+
+def img_decompresser(frames: list, output_folder: str, frame_needed: int, frame_count: int, img_width: int, img_height: int, data_files=None) -> list:
     if data_files != None:
         name = data_files[frame_count].split('/')[-1]
         filename = os.path.join(output_folder, name)
     else:
         filename = os.path.join(output_folder, 'file.jpg')
 
-    os.makedirs('out', exist_ok=True)
-
     block_size = config.block_size
-    input_h, input_w = 1080, 1920
+    count_local_w = 0
+    count_local_h = 0
+    img_arr = np.zeros((img_height, img_width, 3), dtype=np.uint8)
 
-    if imgs_size != None:
-        target_w, target_h = imgs_size[frame_count]
-    else:
-        target_w, target_h = w, h
+    for f in range(frame_needed):
+        advanced_w = count_local_w
+        advanced_h = count_local_h
 
-    # A. Sampling (Center of blocks)
-    offset = block_size // 2
-    sampled_grid = frame[:, offset:input_h:block_size, offset:input_w:block_size, :]
+        for c in range(3):       
+            count_h = count_local_h
+            count_w = count_local_w
 
-    # B. Thresholding
-    bits_recovered = (sampled_grid > 127).astype(np.uint8)
+            for i in range(1, len(frames[f]), block_size): # len(frames[f]) return lenght of first dimension so row lenght
+                color_first_row = [frames[f][i][j][c] for j in range(1, len(frames[f][i]), block_size)] # take all the color (bit -> color in reader) in the first row of block_size
+            
+                for j in range(0, len(color_first_row), 8): # each loop j is a pixel / char (formed by 8 bits)
+                    colors_pixel = color_first_row[j:j + 8]
+                    pixel_bits = ''
+                
+                    for color in colors_pixel:
+                        if color > 127:
+                            pixel_bits += '1'
+                        else:
+                            pixel_bits += '0'
 
-    # C. Flatten to bit stream
-    # Shape: (Total_Bits_Vertical, 3)
-    # Because of our encoder Transpose, this is now correctly ordered:
-    # Row 0: [Pixel0_Bit0_B, Pixel0_Bit0_G, Pixel0_Bit0_R]
-    flat_bits = bits_recovered.reshape(-1, 3)
+                    pixel = int(pixel_bits, 2)
+                    
+                    img_arr[count_h, count_w, c] = pixel
 
-    # D. Truncate Padding
-    total_pixels = target_w * target_h
-    # We need exactly 8 rows per pixel (8 bits)
-    required_rows = total_pixels * 8
-    flat_bits = flat_bits[:required_rows]
+                    # there is not if pixel == 0 :continue because can be exchanged with the color black and jump important data
 
-    # E. Reshape for Packing
-    # We group every 8 rows together. 
-    # Shape becomes: (Pixels, 8_Bits, 3_Channels)
-    flat_bits_grouped = flat_bits.reshape(total_pixels, 8, 3)
+                    count_w += 1
 
-    # F. Pack Bits
-    # We pack along axis 1 (the 8 bits).
-    # Result: (Pixels, 1, 3)
-    img_packed = np.packbits(flat_bits_grouped, axis=1)
+                    if count_w >= img_width:
+                        count_w = 0
+                        count_h += 1
+                    
+                    if count_h >= img_height:
+                        break
 
-    # G. Final Reshape
-    img_final = img_packed.reshape(target_h, target_w, 3)
+                if count_h >= img_height:
+                    break
 
-    cv2.imwrite(filename, img_final)
+            advanced_w = count_w
+            advanced_h = count_h
+        
+        count_local_w = advanced_w
+        count_local_h = advanced_h
+
+    cv2.imwrite(filename, img_arr)
+
+# TODO:
+# make it faster 

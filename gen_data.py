@@ -40,7 +40,7 @@ def get_random_subpath(current_path, current_depth):
 
 def create_random_text_file(filename):
     """Creates a text file with 10 to 30,000 words."""
-    word_count = random.randint(10, 30000)
+    word_count = random.randint(10, 15000)
     
     # A bank of lorem ipsum words
     word_bank = ["lorem", "ipsum", "dolor", "sit", "amet", "consectetur", 
@@ -56,8 +56,8 @@ def create_random_text_file(filename):
 
 def download_real_image(filename):
     """Downloads a REAL image with random dimensions between 200 and 2000 px."""
-    width = random.randint(200, 700)
-    height = random.randint(200, 700)
+    width = random.randint(200, 800)
+    height = random.randint(200, 800)
     
     # Picsum returns a real random photo of the specified size
     url = f"https://picsum.photos/{width}/{height}"

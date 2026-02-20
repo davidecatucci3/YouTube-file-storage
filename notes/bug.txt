@@ -1,7 +1,0 @@
-Traceback (most recent call last):
-  File "/Users/davidecatucci3/Documents/Documents - Davide’s MacBook Air/coding/projects/point/src/main/decoder.py", line 107, in <module>
-    decoder(['data/extracted_2.jpg', 'data/big_one.txt', 'data/im1.jpg', 'data/txt_reader.py', 'data/A/extracted_1.jpg', 'data/A/A1/t.txt', 'data/A/A1/message.txt', 'data/A/A12/notes.txt', 'data/A/A12/notes3.txt', 'data/A/A12/notes1.txt', 'data/C/rt2.txt', 'data/C/rt.txt', 'data/D/a.txt', 'data/B/extracted_3.jpg', 'data/B/encoder.py', 'data/B/extracted_111.jpg'], 'video_decoder.mp4', [(612, 408), (1920, 1080), (612, 408), (1920, 1080), (1200, 630), (1920, 1080), (1920, 1080), (1920, 1080), (1920, 1080), (1920, 1080), (1920, 1080), (1920, 1080), (1920, 1080), (1024, 576), (1920, 1080), (1200, 630)], [25, 2, 25, 1, 73, 1, 1, 1, 1, 1, 1, 1, 1, 57, 1, 73])
-  File "/Users/davidecatucci3/Documents/Documents - Davide’s MacBook Air/coding/projects/point/src/main/decoder.py", line 53, in decoder
-    inp_img[j] = frame
-    ~~~~~~~^^^
-ValueError: could not broadcast input array from shape (720,1280,3) into shape (1080,1920,3)
