@@ -8,7 +8,7 @@ def download_video(url: str) -> str:
     path_file = "video_decoder.mp4"
 
     ydl_opts = {
-        'format': 'bestvideo[height=1080]+bestaudio/best[height=1080]',
+        'format': 'bestvideo[height<=1080]+bestaudio/best[height<=1080]',
         'merge_output_format': 'mp4',
         'outtmpl': path_file
     }

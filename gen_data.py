@@ -6,7 +6,7 @@ import string
 
 # --- Configuration ---
 ROOT_DIR = "data"
-TOTAL_FILES = 50
+TOTAL_FILES = 10
 MAX_DEPTH = 3         # How deep the folder structure can go
 MAX_SUBDIRS = 2       # Max number of subfolders per folder folder
 
@@ -40,7 +40,7 @@ def get_random_subpath(current_path, current_depth):
 
 def create_random_text_file(filename):
     """Creates a text file with 10 to 30,000 words."""
-    word_count = random.randint(10, 30000)
+    word_count = random.randint(10, 15000)
     
     # A bank of lorem ipsum words
     word_bank = ["lorem", "ipsum", "dolor", "sit", "amet", "consectetur", 

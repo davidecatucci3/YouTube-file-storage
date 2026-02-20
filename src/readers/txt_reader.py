@@ -20,7 +20,7 @@ def get_character_generator(path_file, chunk_size=8192):
 
 def count_letters_file(path_file: str) -> int:
     count = 0
-
+    
     with open(path_file, 'r', encoding='utf-8', errors='replace') as f:
         for chunk in iter(lambda: f.read(8192), ''):
             count += len(chunk)
@@ -45,7 +45,7 @@ def txt_reader(path_file: str) -> np.ndarray:
     frames = np.zeros((frame_needed, video_height, video_width, 3), dtype=np.uint8)
 
     char_stream = get_character_generator(path_file)
-
+    
     for f in range(frame_needed):
         k = 0
         i, j = 0, 0
@@ -56,7 +56,7 @@ def txt_reader(path_file: str) -> np.ndarray:
             except StopIteration:
                 break
             
-            char_code = ord(char) % 256
+            char_code = ord(char) % 256 # recognize only 8 bits so 256 chars (not all of them that are 1024)
             char_bits = bin(char_code)[2:].zfill(8)
         
             for bit in char_bits:   
@@ -74,7 +74,7 @@ def txt_reader(path_file: str) -> np.ndarray:
                     i += block_size      
 
             k += 1      
-    
+            
     return frames, frame_needed
 
 # TODO:

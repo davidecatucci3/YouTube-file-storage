@@ -47,7 +47,7 @@ def run(path_data: str) -> None:
     '''
     
     data_files, all_frame_needed = encoder(path_data) # put data in the video
-    print(data_files, all_frame_needed)
+
     # upload video on youtube
     VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")  
     argparser.add_argument("--file", default="video_encoder.mp4", help="Video file to upload")
