@@ -1,0 +1,25 @@
+[Start of File]
+|
+|-- [Box: ftyp] (Header: 8 bytes, Data: ~24 bytes) -> "I am MP4"
+|
+|-- [Box: mdat] (Header: 8 bytes, Data: HUGE)
+|     |
+|     |-- [Compressed Frame 1 bytes (I-Frame)]
+|     |-- [Compressed Frame 2 bytes (P-Frame)]
+|     |-- [Compressed Frame 3 bytes (P-Frame)]
+|     |-- ... (repeats for 'tot_frames')
+|
+|-- [Box: moov] (Header: 8 bytes, Data: Metadata)
+      |
+      |-- [Box: mvhd] (Movie Header: Duration, Time Scale)
+      |-- [Box: trak] (Video Track)
+            |
+            |-- [Box: mdia] -> [Box: minf] -> [Box: stbl]
+                  |
+                  |-- [stco table] -> "Frame 1 is at byte 32"
+                  |-- [stsz table] -> "Frame 1 is 50kb"
+
+python3 src/main/upload_video.py --file="video1.mp4" --title="My Great Video" --description="Testing the API"whats 
+
+fps = 24 -> 24frames/1sec -> duration 1 frame is 1 / 24 so 0,04
+
