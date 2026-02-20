@@ -6,9 +6,9 @@ import string
 
 # --- Configuration ---
 ROOT_DIR = "data"
-TOTAL_FILES = 10
-MAX_DEPTH = 3         # How deep the folder structure can go
-MAX_SUBDIRS = 2       # Max number of subfolders per folder folder
+TOTAL_FILES = 40
+MAX_DEPTH = 0         # How deep the folder structure can go
+MAX_SUBDIRS = 0       # Max number of subfolders per folder folder
 
 def clean_data_dir():
     """Removes the data directory if it exists and creates a new one."""
@@ -56,8 +56,8 @@ def create_random_text_file(filename):
 
 def download_real_image(filename):
     """Downloads a REAL image with random dimensions between 200 and 2000 px."""
-    width = random.randint(200, 1500)
-    height = random.randint(200, 1500)
+    width = random.randint(200, 800)
+    height = random.randint(200, 800)
     
     # Picsum returns a real random photo of the specified size
     url = f"https://picsum.photos/{width}/{height}"

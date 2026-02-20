@@ -112,3 +112,4 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
 # in fourcc which choose?
 # frames_per_slice should be 1 or less as possible
 # how many API call can i do per day, how many video i can upload per day?
+# bug when mix text and images (text sligh more errors in letters)

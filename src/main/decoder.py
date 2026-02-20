@@ -48,17 +48,19 @@ def decoder(data_files: str, path_video: str, all_frame_needed: list[int]) -> No
      
         file_type = magic.from_file(data_files[count_files], mime=True)
 
-        if all_frame_needed[count_files] > 1:
+        frame_needed = all_frame_needed[count_files]
+
+        if frame_needed > 1:
             j = 0
             frame_count_local = 0
-            frames = np.zeros((all_frame_needed[count_files], video_height, video_width, 3)) # all frame together of frames form the data file
+            frames = np.zeros((frame_needed, video_height, video_width, 3), dtype=np.uint8) # all frame together of frames form the data file
 
-            while frame_count_local < all_frame_needed[count_files] * frames_per_slide - 1:
+            while frame_count_local < frame_needed * frames_per_slide - 1:
                 if frame_count_local % frames_per_slide == 0: # get frame i want not the copies 
                     frames[j] = frame 
 
                     j += 1
-                        
+                    
                 frame_count_local += 1
                 
                 ret, frame = cap.read()
@@ -69,12 +71,12 @@ def decoder(data_files: str, path_video: str, all_frame_needed: list[int]) -> No
                 res = db.get(User.path_file == path_file)
                 img_width, img_height = res['frame dim']
 
-                img_decompresser(frames, output_folder, all_frame_needed[count_files], count_files, img_width, img_height, data_files)
+                img_decompresser(frames, output_folder, frame_needed, count_files, img_width, img_height, data_files)
             elif file_type.startswith('text/'):
-                txt_decompresser(frames, output_folder, count_files, all_frame_needed[count_files], data_files)
+                txt_decompresser(frames, output_folder, count_files, frame_needed, data_files)
 
             count_files += 1
-        else:         
+        else:      
             # frame require (frame_needed, width, height, 3) as input
             frame = frame.reshape((1, frame.shape[0], frame.shape[1], 3))
 
@@ -84,9 +86,9 @@ def decoder(data_files: str, path_video: str, all_frame_needed: list[int]) -> No
                 res = db.get(User.path_file == path_file)
                 img_width, img_height = res['frame dim']
 
-                img_decompresser(frame, output_folder, all_frame_needed[count_files], count_files, img_width, img_height, data_files)
+                img_decompresser(frame, output_folder, frame_needed, count_files, img_width, img_height, data_files)
             elif file_type.startswith('text/'):      
-                txt_decompresser(frame, output_folder, count_files, all_frame_needed[count_files], data_files)
+                txt_decompresser(frame, output_folder, count_files, frame_needed, data_files)
 
             count_files += 1
 
