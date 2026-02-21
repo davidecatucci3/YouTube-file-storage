@@ -45,6 +45,7 @@ def run(path_data: str) -> None:
     
     :param path_data: path of the folder where all the data are
     '''
+
     time_start = time.time()
     data_files, all_frame_needed = encoder(path_data) # put data in the video
     
