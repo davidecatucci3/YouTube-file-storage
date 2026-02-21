@@ -45,9 +45,9 @@ def run(path_data: str) -> None:
     
     :param path_data: path of the folder where all the data are
     '''
-    
+    time_start = time.time()
     data_files, all_frame_needed = encoder(path_data) # put data in the video
-    print(data_files, all_frame_needed)
+    
     # upload video on youtube
     VALID_PRIVACY_STATUSES = ("public", "private", "unlisted")  
     argparser.add_argument("--file", default="video_encoder.mp4", help="Video file to upload")
@@ -78,5 +78,8 @@ def run(path_data: str) -> None:
     path_video = download_video(url) # download from youtube the video uplaoded before
 
     decoder(data_files, path_video, all_frame_needed) # extract data from the video and decompress it
+    time_end = time.time()
+
+    print(f'Tot time: {time_end - time_start}')
 
 run('data')

@@ -32,6 +32,7 @@ def decoder(data_files: str, path_video: str, all_frame_needed: list[int]) -> No
     video_width = config.video_width
     video_height = config.video_height
     frames_per_slide = config.frames_per_slide
+    frames_per_slide_img = config.frames_per_slide_img
     output_folder = 'out'
     count_files = 0
 
@@ -45,7 +46,10 @@ def decoder(data_files: str, path_video: str, all_frame_needed: list[int]) -> No
 
         if not ret:
             break
-     
+
+        if count_files >= len(data_files):
+            break
+
         file_type = magic.from_file(data_files[count_files], mime=True)
 
         frame_needed = all_frame_needed[count_files]
@@ -55,17 +59,17 @@ def decoder(data_files: str, path_video: str, all_frame_needed: list[int]) -> No
             frame_count_local = 0
             frames = np.zeros((frame_needed, video_height, video_width, 3), dtype=np.uint8) # all frame together of frames form the data file
 
-            while frame_count_local < frame_needed * frames_per_slide - 1:
-                if frame_count_local % frames_per_slide == 0: # get frame i want not the copies 
-                    frames[j] = frame 
-
-                    j += 1
-                    
-                frame_count_local += 1
-                
-                ret, frame = cap.read()
-
             if file_type.startswith('image/'):  
+                while frame_count_local < frame_needed * frames_per_slide_img - 1:
+                    if frame_count_local % frames_per_slide_img == 0: # get frame i want not the copies 
+                        frames[j] = frame 
+
+                        j += 1
+                        
+                    frame_count_local += 1
+                
+                    ret, frame = cap.read()
+
                 path_file = data_files[count_files]
 
                 res = db.get(User.path_file == path_file)
@@ -73,6 +77,16 @@ def decoder(data_files: str, path_video: str, all_frame_needed: list[int]) -> No
 
                 img_decompresser(frames, output_folder, frame_needed, count_files, img_width, img_height, data_files)
             elif file_type.startswith('text/'):
+                while frame_count_local < frame_needed * frames_per_slide - 1:
+                    if frame_count_local % frames_per_slide == 0: # get frame i want not the copies 
+                        frames[j] = frame 
+
+                        j += 1
+                        
+                    frame_count_local += 1
+
+                    ret, frame = cap.read()
+
                 txt_decompresser(frames, output_folder, count_files, frame_needed, data_files)
 
             count_files += 1
@@ -87,18 +101,26 @@ def decoder(data_files: str, path_video: str, all_frame_needed: list[int]) -> No
                 img_width, img_height = res['frame dim']
 
                 img_decompresser(frame, output_folder, frame_needed, count_files, img_width, img_height, data_files)
+
+                # i dont't want to check the frames_per_slice frames that are just the copy of the one i want to see so i skip them
+                frame_count_local2 = 0
+
+                while frame_count_local2 < frames_per_slide_img - 1:
+                    ret, frame = cap.read()
+
+                    frame_count_local2 += 1
             elif file_type.startswith('text/'):      
                 txt_decompresser(frame, output_folder, count_files, frame_needed, data_files)
+            
+                # i dont't want to check the frames_per_slice frames that are just the copy of the one i want to see so i skip them
+                frame_count_local2 = 0
+
+                while frame_count_local2 < frames_per_slide - 1:
+                    ret, frame = cap.read()
+
+                    frame_count_local2 += 1
 
             count_files += 1
-
-            # i dont't want to check the frames_per_slice frames that are just the copy of the one i want to see so i skip them
-            frame_count_local2 = 0
-
-            while frame_count_local2 < frames_per_slide - 1:
-                ret, frame = cap.read()
-
-                frame_count_local2 += 1
    
         print(f"Saved {data_files[count_files - 1]}")
     
