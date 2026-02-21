@@ -79,7 +79,7 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
             frame_start = curr_frame
             frame_end = frame_start + (frame_needed * frames_per_slide_img)
 
-            curr_duration += (frame_needed * frames_per_slide_img) / fps
+            curr_duration += (frame_needed * frames_per_slide) / fps
 
             db.insert({'path_file': path_file, 'url': '', 'file type': file_type, 'frame dim': (img_width, img_height), 'frame needed': frame_needed, 'frame start': frame_start, 'frame end': frame_end})
 
