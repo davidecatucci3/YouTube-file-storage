@@ -1,0 +1,4 @@
+1) 
+with random noise i cannot do compresison because there are no pattern of equal or similar colors togehter to transfoorm in one color, so
+i can put similar color togheters and do the compression
+

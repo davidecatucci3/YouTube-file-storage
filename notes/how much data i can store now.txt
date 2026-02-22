@@ -1,0 +1,20 @@
+current: block_size=2 -> 1 pixel = 32 pixel ()
+
+es.(8, 4x4)
+video frame size is 1920x1080 = 2.073.600 pixel
+pixel_img = 5184 * 3456 = 17.915.904 
+pixel_per_frame = (1920 * 1080) / (16*8) = 16.200 pixel
+frame_needed = 17.915.904 / 16.200 = 1.105
+
+size_img = 17MB
+size_now = 1105 * (1920 * 1080 * 8 * 3) = 7GB
+
+
+es.(8, 2x2)
+video frame size is 1920x1080 = 2.073.600 pixel
+pixel_img = 5184 * 3456 = 17.915.904 
+pixel_per_frame = (1920 * 1080) / (16*8) = 16.200 pixel
+frame_needed = 17.915.904 / 16.200 = 1.105
+
+size_img = 17MB
+size_now = 1105 * (1920 * 1080 * 8 * 3) = 7GB

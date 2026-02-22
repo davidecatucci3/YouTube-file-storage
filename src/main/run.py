@@ -63,6 +63,7 @@ def run(path_data: str) -> None:
         exit("Please specify a valid file using the --file= parameter.")
 
     youtube = get_authenticated_service(args)
+    
     try:
         url, video_id = initialize_upload(youtube, args)
     except HttpError as e:

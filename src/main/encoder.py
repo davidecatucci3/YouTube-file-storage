@@ -72,9 +72,9 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
         file_type = magic.from_file(path_file, mime=True)
 
         if file_type.startswith('image/'):
-            size, frames, frame_needed = img_reader(path_file)  
-            
-            img_width, img_height = size
+            frame_generator = img_reader(path_file) 
+
+            (img_width, img_height), frame_needed = next(frame_generator) 
 
             frame_start = curr_frame
             frame_end = frame_start + (frame_needed * frames_per_slide_img)
@@ -83,13 +83,15 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
 
             db.insert({'path_file': path_file, 'url': '', 'file type': file_type, 'frame dim': (img_width, img_height), 'frame needed': frame_needed, 'frame start': frame_start, 'frame end': frame_end})
 
-            for r in range(frame_needed):
+            for frame in frame_generator:
                 for _ in range(frames_per_slide_img):
-                    out.write(frames[r])
+                    out.write(frame)
 
                     curr_frame += 1
         elif file_type.startswith('text/'):
-            frames, frame_needed = txt_reader(path_file) 
+            frame_generator = txt_reader(path_file) 
+
+            frame_needed = next(frame_generator)
 
             frame_start = curr_frame
             frame_end = frame_start + (frame_needed * frames_per_slide)
@@ -98,9 +100,9 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
             
             db.insert({'path_file': path_file, 'url': '', 'file type': file_type, 'frame dim': (0, 0), 'frame needed': frame_needed, 'frame start': frame_start, 'frame end': frame_end})
             
-            for r in range(frame_needed):
+            for frame in  frame_generator:
                 for _ in range(frames_per_slide):
-                    out.write(frames[r])
+                    out.write(frame)
 
                     curr_frame += 1
     

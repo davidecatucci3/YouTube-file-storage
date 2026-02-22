@@ -6,7 +6,7 @@ import string
 
 # --- Configuration ---
 ROOT_DIR = "data"
-TOTAL_FILES = 40
+TOTAL_FILES = 10
 MAX_DEPTH = 3         # How deep the folder structure can go
 MAX_SUBDIRS = 2       # Max number of subfolders per folder folder
 
@@ -81,7 +81,7 @@ def generate_dataset():
     
     for i in range(1, TOTAL_FILES + 1):
         # 1. Choose file type (50/50 chance)
-        is_image = random.choice([True, False])
+        is_image = random.choice([False, False])
         
         # 2. Get a random directory path inside data/
         file_path = get_random_subpath(ROOT_DIR, 0)

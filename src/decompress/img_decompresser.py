@@ -3,11 +3,6 @@ import config
 import cv2
 import os
 
-import numpy as np
-import config
-import cv2
-import os
-
 def img_decompresser(frames: list, output_folder: str, frame_needed: int, frame_count: int, img_width: int, img_height: int, data_files=None) -> list:
     if data_files != None:
         name = data_files[frame_count].split('/')[-1]
