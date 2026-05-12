@@ -1,4 +1,6 @@
+import numpy as np
 import os
+
 from PIL import Image, ImageChops, ImageStat
 
 # --- 1. LEVENSHTEIN DISTANCE FUNCTION ---
@@ -58,6 +60,8 @@ y_txts.sort(key=lambda f: os.path.basename(f))
 
 # --- 4. COMPARE IMAGES ---
 print("\n--- Image Comparison ---")
+arr1_dist = np.zeros((1000))
+
 for i, (path_x, path_y) in enumerate(zip(x_imgs, y_imgs)):
     name_x = os.path.basename(path_x)
     name_y = os.path.basename(path_y)
@@ -73,12 +77,17 @@ for i, (path_x, path_y) in enumerate(zip(x_imgs, y_imgs)):
             diff = ImageChops.difference(img1, img2)
             stat = ImageStat.Stat(diff)
             avg_diff = sum(stat.mean)
+
+            arr1_dist[i] = avg_diff
+
             if avg_diff > 0:
                 print(f"[{i}] {match_tag} names ({name_x}) | Avg Color Diff: {avg_diff:.4f}")
             else:
                 print(f"[{i}] {match_tag} names ({name_x}) | Images are identical.")
     except Exception as e:
         print(f"[{i}] Error processing {name_x}: {e}")
+
+np.save('tests/avg_pixel_distribution.npy', arr1_dist)
 
 # --- 5. COMPARE TEXT (NORMALIZED) ---
 import os

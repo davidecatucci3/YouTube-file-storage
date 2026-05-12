@@ -5,6 +5,7 @@ publish on YouTube (pusblished so it can be stored)
 
 import config
 import magic
+import time
 import cv2
 import os
 
@@ -68,10 +69,19 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
     MAX_DURATION = 12 * 3600 # 12H in sec
     MAX_SIZE = 256 # in GB
 
+    count_img = 0
+    count_txt = 0
+    time_reading_img = 0.0
+    time_reading_txt = 0.0
+
+    c = 0
+
     for path_file in data_files:
         file_type = magic.from_file(path_file, mime=True)
 
         if file_type.startswith('image/'):
+            time_reading_img_start = time.time()
+
             frame_generator = img_reader(path_file) 
 
             (img_width, img_height), frame_needed = next(frame_generator) 
@@ -88,7 +98,15 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
                     out.write(frame)
 
                     curr_frame += 1
+
+            time_reading_img_end = time.time()
+
+            time_reading_img += (time_reading_img_end - time_reading_img_start)
+            
+            count_img += 1
         elif file_type.startswith('text/'):
+            time_reading_txt_start = time.time()
+
             frame_generator = txt_reader(path_file) 
 
             frame_needed = next(frame_generator)
@@ -105,6 +123,12 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
                     out.write(frame)
 
                     curr_frame += 1
+
+            time_reading_txt_end = time.time()
+
+            time_reading_txt += (time_reading_txt_end - time_reading_txt_start)
+
+            count_txt += 1
     
         all_frame_needed.append(frame_needed)
 
@@ -113,8 +137,10 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
 
             curr_size = curr_size_bytes / (1024 * 1024 * 1024)
         
-        print(f'frame range: {frame_start:3d}-{frame_end:3d} | duration: {curr_duration:.3f}s/{MAX_DURATION}s | size: {curr_size:.3f} GB/{MAX_SIZE} GB')
- 
+        print(f'id: {c:3d}/{len(data_files):3d} | frame range: {frame_start:3d}-{frame_end:3d} | duration: {curr_duration:.3f}s/{MAX_DURATION}s | size: {curr_size:.3f} GB/{MAX_SIZE} GB')
+
+        c += 1
+        
     out.release()   
 
     if os.path.exists(filename):
@@ -122,6 +148,11 @@ def encoder(path_data: str) -> list[tuple[int, int]]:
 
         size = size_bytes / (1024 * 1024 * 1024)
     
+    avg_time_reading_img = time_reading_img / count_img
+    avg_time_reading_txt = time_reading_img / count_img
+
+    print(f'Avg time reading img: {avg_time_reading_img:.3f}')
+    print(f'Avg time reading txt: {avg_time_reading_txt:.3f}')
     print(f'final size: {size:.3f} GB')
 
     return data_files, all_frame_needed

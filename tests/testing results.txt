@@ -1,0 +1,21 @@
+1) 
+Size: 100 imgs (37MB)
+Data Types: .jpg
+Range length imgs: 200x200 -> 4000x3000
+
+config.py: video_width = 1920
+           video_height = 1080
+           fps = 30
+           frames_per_slide = 8
+           frames_per_slide_img = 2
+           block_size = 2
+
+Execution time: 
+Avg execution time per image: READING 2.7s DECOMPRESSION: 
+Time for searching: 
+Size video: 3.2GB
+Duration video: 168.5s = 2.48min
+Plot distribution framed needed
+Plot distribution avg pixel difference (on x axis image number and on y axis avg pixel difference)
+
+
