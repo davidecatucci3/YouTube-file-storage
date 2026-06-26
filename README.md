@@ -18,6 +18,32 @@ A local [TinyDB](https://tinydb.readthedocs.io/) database (`my_data.json`) maps 
 
 ---
 
+
+## How It Works
+
+1. **Encode** — Binary data from your files is converted into visual frames (pixel patterns) and compiled into an `.mp4` video.
+2. **Upload** — The video is uploaded to YouTube via the YouTube Data API v3.
+3. **Wait** — The system polls YouTube until the video finishes processing.
+4. **Download** — The processed video is downloaded from YouTube.
+5. **Decode** — Frames are read and the original binary data is reconstructed, restoring your files exactly.
+
+A local [TinyDB](https://tinydb.readthedocs.io/) database (`my_data.json`) maps each original file path to its corresponding YouTube URL for retrieval.
+
+---
+
+## Surviving YouTube's Compression: How Encoding Works
+
+YouTube heavily compresses all uploaded videos to save bandwidth. This compression introduces visual artifacts, blurring, and color shifts. If we mapped one bit of data to a single pixel, YouTube's lossy compression would instantly corrupt the underlying file. 
+
+To guarantee **100% byte-perfect retrieval** without any quality loss upon decoding, this project employs a resilient encoding strategy:
+
+* **Pixel Blocks (Macroblocks):** Instead of using a single pixel per bit, the data is scaled up. A single bit of binary data is represented by a larger grid of pixels (e.g., a 4x4 or 8x8 block). Even if the edges of this block blur during YouTube's compression, the "core" of the block remains intact.
+* **High-Contrast Binary Palette:** Data is encoded strictly in pure black (binary `0`) and pure white (binary `1`). By avoiding color or grayscale, we maximize the contrast and leave no room for compression algorithms to confuse the data.
+* **Threshold Decoding:** During the decoding phase, the script reads the downloaded video frames. For each macroblock, it samples the pixels and calculates the average luminance. If the average is above a certain threshold (closer to white), it records a `1`; if below (closer to black), it records a `0`. This simple mathematical thresholding completely neutralizes compression artifacts.
+* **Frame Headers & Anchors:** Because YouTube might slightly drop frames or alter timing, frames include built-in visual markers or headers. This ensures the decoder always knows exactly where the data grid starts and what sequence of the file it is currently reading.
+
+---
+
 ## Project Structure
 
 ```
